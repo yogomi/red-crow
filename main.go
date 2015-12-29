@@ -13,6 +13,7 @@ func main() {
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("X-Accept-Datetime-Format", "UNIX")
+	req.Header.Set("Accept-Encoding", "")
 
 	if err != nil {
 		fmt.Println(err)
@@ -22,13 +23,11 @@ func main() {
 
 	byteArray, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
-	fmt.Printf("%#v\n", resp.Header)
 	etag := resp.Header.Get("Etag")
 	fmt.Println(etag)
 	fmt.Println(resp.Status)
 
 	req.Header.Add("If-None-Match", etag)
-	fmt.Printf("%#v\n", req.Header)
 
 	resp, _ = client.Do(req)
 	fmt.Println(resp.Status)
