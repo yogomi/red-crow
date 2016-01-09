@@ -7,20 +7,34 @@ import (
 	"net/http"
 )
 
-const token_length = 65
+
+func read_token() (string, error) {
+	const token_length = 65
+	file, err := os.Open("token.txt")
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+
+	data := make([]byte, token_length)
+	count, err := file.Read(data)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	fmt.Printf("%d %q\n", count, data);
+	return string(data), nil
+}
 
 func main() {
 	url := "https://api-fxtrade.oanda.com/v1/accounts"
 	client := &http.Client{}
 
-	file, err := os.Open("token.txt")
+	token, err := read_token()
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
-	data := make([]byte, token_length)
-	count, err := file.Read(data)
-	fmt.Printf("%d %q\n", count, data);
-	token := string(data)
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("X-Accept-Datetime-Format", "UNIX")
